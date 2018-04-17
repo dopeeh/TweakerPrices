@@ -2,9 +2,15 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import csv
+import re
+import datetime
 
-productList = ["not a product i", "blablasd base 700", "be quiet dark base 700", "be quiet pure rock"]
+with open('../Input/MelvTest.csv', 'r') as f:
+  reader = csv.reader(f)
+  vendor_list = list(reader)
+vendor_list.pop(0)
 successList = []
+
 
 def checkCookie():
     try:
@@ -13,12 +19,10 @@ def checkCookie():
     except:
         return False;
 
-for product in productList:
-    outputfile = product + ".csv"
-
+for product in vendor_list:
     driver = webdriver.Chrome(executable_path="C:\\Users\\melk\\PycharmProjects\\GUI\\drivers\\chromedriver.exe")
 
-    driver.set_page_load_timeout(15)
+    driver.set_page_load_timeout(10)
     driver.get("https://tweakers.nl")
 
     if checkCookie():
@@ -27,9 +31,15 @@ for product in productList:
     driver.find_element_by_name("keyword").send_keys(product)
     driver.find_element_by_xpath("//input[@value='Zoeken']").click()
     driver.find_element_by_xpath("//input[@value='Zoeken']").click()
-    time.sleep(1)
+    #time.sleep(1)
     try:
+        productNaam = driver.find_element_by_xpath("//div[@id='listingContainer']/div/ul/li/p/a").text
         driver.find_element_by_xpath("//div[@id='listingContainer']/div/ul/li/a").click()
+
+        filteredVN = str(product)[2:-2]
+        filteredPN = re.sub('[*."/;|=,]', '', productNaam)
+
+        outputfile = "../Output/" + filteredPN + ".csv"
 
         #Check of je al op de prijzenpagina bent
         def checkPage():
@@ -41,14 +51,19 @@ for product in productList:
 
         #Navigeer naar de prijzenpagina
         if checkPage() == False:
-            time.sleep(1)
+            #time.sleep(1)
             driver.find_element_by_xpath(".//tr[@class='largethumb']/td[@class='itemname']/p/a").click()
+        else:
+            print("Success!")
 
-
+        productLijst = []
+        vendorpnLijst = []
         winkelLijst = []
         winkelLijstElementen = driver.find_elements_by_xpath("//div[@id='listing']/table/tbody//p[@class='ellipsis']/a")
         for i in winkelLijstElementen:
             winkelLijst.append(i.text)
+            productLijst.append(filteredPN)
+            vendorpnLijst.append(filteredVN)
 
 
         prijsLijst = []
@@ -56,18 +71,21 @@ for product in productList:
         for i in prijsLijstElementen:
             prijsLijst.append(i.text)
 
-        result = dict(zip(winkelLijst, prijsLijst))
+        result_notzipped = [productLijst,
+                  vendorpnLijst,
+                  winkelLijst,
+                  prijsLijst]
+        result = zip(*result_notzipped)
 
         with open(outputfile, 'w') as output:
             writer = csv.writer(output)
-            for key, value in result.items():
-                writer.writerow([key, value])
+            writer.writerows(result)
 
         successList.append(product)
     except:
-        print("Product '" + product + "' not found.")
+        print("Product '" + str(product) + "' not found.")
 
-    time.sleep(1)
+    #time.sleep(1)
     driver.quit()
 
 print("Successfully scraped {0} products!".format(len(successList)))
