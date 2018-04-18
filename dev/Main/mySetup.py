@@ -2,12 +2,12 @@ from cx_Freeze import setup, Executable
 
 base = None
 
-executables = [Executable("main.py", base=base)]
+executables = [Executable("TweakerPrices.py", base=base)]
 packages = ["idna", "selenium", "six", 'pkg_resources._vendor']
 options = {
     'build_exe': {
         'packages':packages,
-        'include_files': ['Input/'],
+        'include_files': ['Input/', 'drivers/'],
     },
 }
 
