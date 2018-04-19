@@ -1,5 +1,0 @@
-- More browsers to drive.
-- Support for multiple CSV files
-- Work away the try: except: statements.
-- Shorten the code.
-- Let the user choose the format to Output the data.
