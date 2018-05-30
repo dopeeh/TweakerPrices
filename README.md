@@ -8,4 +8,4 @@ just download the bin folder and run the executable.
 # How to use
 To use the program put a CSV file in the 'Input' folder. This should be in the same format as the example file. You can't put multiple files in yet.
 
-After running the program and watching it scrape like a beast, you will find the output in the 'Output' folder. That should be all you need!
+After running the program and watching it scrape, you will find the output in the 'Output' folder. That should be all you need!
